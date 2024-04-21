@@ -24,10 +24,7 @@ Welcome to our eCommerce project! This project aims to create an online platform
 - ## Getting Started
 
 1. Clone the repository:
-
-   ```bash
-   git clone:
-   https://github.com/Prasad-Bojja/Ecommerce-project
+   git clone: https://github.com/Prasad-Bojja/Ecommerce-project
 
 2. Install dependencies:
    cd eCommerce-project
