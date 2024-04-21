@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+        }
+        .invoice-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .invoice-details {
+            margin-bottom: 20px;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .table th {
+            background-color: #f2f2f2;
+        }
+        .total-row {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="invoice-title">
+            <h2>Invoice</h2>
+            <h3>Order #{{ order_id }}</h3>
+        </div>
+        
+        <div class="invoice-details">
+            <div>
+                <h4>Billed To:</h4>
+                {% if checkout_info %}
+                    <p>
+                        Name : {{ checkout_info.0.first_name }}<br>
+                        Address: {{ checkout_info.0.address1 }}<br>
+                        Phone: {{ checkout_info.0.mobile }}
+                    </p>
+                {% endif %}
+            </div>
+            <div>
+                <h4>Shipped To:</h4>
+                {% if checkout_info %}
+                    <p>
+                        Name : {{ checkout_info.0.first_name }}<br>
+                        Address: {{ checkout_info.0.address1 }}<br>
+                        Phone: {{ checkout_info.0.mobile }}
+                    </p>
+                {% endif %}
+            </div>
+            <div>
+                <h4>Payment Method:</h4>
+                <p>{{ payment_method }}</p>
+            </div>
+            <div>
+                <h4>Order Date:</h4>
+                <p>{{ transcation_date }}</p>
+            </div>
+        </div>
+        
+        <div class="invoice-items">
+            <h3>Order Summary</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                        <tr>
+                            <td>{{ item.product.product_name }}</td>
+                            <td>{{ item.get_product_price }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.get_product_price_with_quantity }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="3" align="right">Subtotal</td>
+                        <td>{{ subtotal }}</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="3" align="right">Shipping</td>
+                        <td>free</td>
+                    </tr>
+                    {% if cart.coupon %}
+                        <tr class="total-row">
+                            <td colspan="3" align="right">Coupon Applied</td>
+                            <td>- {{ cart.coupon.discount_price }}</td>
+                        </tr>
+                    {% endif %}
+                    <tr class="total-row">
+                        <td colspan="3" align="right">Total</td>
+                        <td>{{ total_amount }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

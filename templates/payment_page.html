@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+ {% load static %}
+  
+ {% block body %}
+
+<div class="breadcrumbs">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <div class="bread-inner">
+          <ul class="bread-list">
+            <li>
+              <a href="">Home <i class="ti-arrow-right"></i></a>
+            </li>
+            <li class="active"><a href="{% url 'checkout' %}">Checkout</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="shop checkout section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-4 col-md-10 col-12">
+        <div class="order-details">
+          <div class="single-widget">
+            <h2>CART TOTALS</h2>
+            <div class="content">
+              <ul>
+                <li>Sub Total <span>₹{{ subtotal }}</span></li>
+                <li>(+) Shipping <span>Free</span></li>
+                <li class="last">Total <span>₹{{ total_price }}</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="single-widget payment">
+            <h2>Select Payment Method</h2><br>
+
+            <div class="content">
+                <center>
+                    <img
+                src="{% static 'eshop/images/payment-method.png' %}"
+                alt="Payment Methods"
+              />
+                </center>
+              
+            </div>
+          </div>
+          <div class="single-widget get-button">
+            <div class="content">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <button class="btn" type="submit" name="cod">Cash on Delivery</button>
+                    <button class="btn" name="razorpay" id="rzp-button1">
+                        Pay with Razorpay
+                    </button>
+                </form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        "key": "rzp_test_0TYKFUTdQdC3l9", // Enter the Key ID generated from the Dashboard
+        "amount": {{ payment.amount }}, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        "currency": "INR",
+        "name": "Ecommerce",
+        "description": "Test Transaction",
+        "image": "https://example.com/your_logo",
+        "order_id": "{{ payment.id }}", // This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+        "handler": function (response) {
+            window.location.href = `http://127.0.0.1:8000/success/?razorpay_payment_id=${response.razorpay_payment_id}&razorpay_order_id=${response.razorpay_order_id}&razorpay_order_id=${response.razorpay_order_id}`
+        },
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+    
+    var rzp1 = new Razorpay(options);
+    rzp1.on('payment.failed', function (response) {
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+    });
+    document.getElementById('rzp-button1').onclick = function(e) {
+        rzp1.open();
+        e.preventDefault();
+    }
+</script>
+
+{% endblock body %}

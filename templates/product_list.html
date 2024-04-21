@@ -1,0 +1,115 @@
+{% extends "base.html" %} 
+{% load static %} 
+
+{% block body %}
+<!-- Start Product Area -->
+<div class="product-area section">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <div class="section-title">
+          <h2>Trending Items</h2>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="product-info">
+          <div class="nav-main">
+            <!-- Tab Nav -->
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+              {% for category, products in categorized_products.items %}
+              <li class="nav-item">
+                <a class="nav-link {% if forloop.first %}active{% endif %}" data-toggle="tab" href="#{{ category }}" role="tab">{{ category }}</a>
+              </li>
+              {% endfor %}
+            </ul>
+            <!--/ End Tab Nav -->
+          </div>
+          <div class="tab-content" id="myTabContent">
+            <!-- Loop through categories -->
+            {% for category, products in categorized_products.items %}
+            <!-- Start Single Tab -->
+            <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="{{ category }}" role="tabpanel">
+              <div class="tab-single">
+                <div class="row">
+                  <!-- Loop through products within the current category -->
+                  {% for product in products %}
+                  <div class="col-xl-3 col-lg-4 col-md-4 col-12">
+                    <div class="single-product">
+                      <div class="product-img">
+                        <a href="{% url 'get_product' product.slug %}">
+                          <img class="default-img" src="{{ product.product_images.last.image.url }}" alt="{{ product.product_name }}" width="463" height="612">
+                          <img class="hover-img" src="{{ product.product_images.last.image.url }}" alt="{{ product.product_name }}" width="463" height="612">
+                        </a>
+                        <div class="button-head">
+                          <div class="product-action">
+                            <a title="Wishlist" href="{% url 'wish_list' product.uid %}"><i class="ti-heart"></i><span>Add to Wishlist</span></a>
+                          </div>
+                          <div class="product-action-2">
+                            <a title="Add to cart" href="{% url 'add_to_cart' product.uid %}?variant={{ selected_size }}">Add to cart</a>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="product-content">
+                        <h3><a href="{% url 'get_product' product.slug %}">{{ product.product_name | slice:":25"}}</a></h3>
+                        <div class="product-price">
+                          <span>₹ {{ product.price }}.00</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            <!--/ End Single Tab -->
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Product Area -->
+
+
+
+
+<div class="d-flex justify-content-end">
+  <div class="pagination">
+
+ 
+    <nav aria-label="...">
+      <ul class="pagination">
+        {% for category, products_page_obj in categorized_products.items %}
+        
+          <li class="page-item {% if not products_page_obj.has_previous %}disabled{% endif %}">
+            
+          </li>
+          {% for page_num in products_page_obj.paginator.page_range %}
+            <li class="page-item {% if page_num == products_page_obj.number %}active{% endif %}">
+              <a class="page-link" href="?page={{ page_num }}">{{ page_num }}{% if page_num == products_page_obj.number %} <span class="sr-only">(current)</span>{% endif %}</a>
+            </li>
+          {% endfor %}
+          <li class="page-item {% if not products_page_obj.has_next %}disabled{% endif %}">
+            
+          </li>
+          {% endfor %}
+        
+      </ul>
+    </nav>
+
+  </div>
+</div>
+
+
+
+
+
+
+<br>
+
+
+
+{% endblock body %}

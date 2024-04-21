@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% block body %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style>
+        /* Add your custom CSS styles here */
+        .carousel-control-prev,
+        .carousel-control-next {
+            background-color: transparent; /* Make background transparent */
+            border: none; /* Remove border */
+            width: 50px; /* Set width */
+            height: 50px; /* Set height */
+            border-radius: 50%; /* Make it circular */
+            top: 50%; /* Position vertically centered */
+            transform: translateY(-50%); /* Adjust vertical position */
+        }
+
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            background-color: #000000; /* Set icon color to black */
+            border-radius: 50%; /* Make it circular */
+            width: 30px; /* Set width */
+            height: 30px; /* Set height */
+            margin-top: 10px; /* Adjust vertical position */
+        }
+
+        .carousel-control-prev-icon::before,
+        .carousel-control-next-icon::before {
+            content: ""; /* Clear default content */
+            position: absolute; /* Position absolutely */
+            top: 0; /* Position at the top */
+            left: 0; /* Position at the left */
+            right: 0; /* Position at the right */
+            bottom: 0; /* Position at the bottom */
+            background: none; /* Clear background */
+            border: 0; /* Clear border */
+        }
+
+        .row {
+            margin-bottom: 15px;
+        }
+
+        .col-3 {
+            font-weight: bold;
+            text-align: ;
+        }
+
+        .col-9 {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <br /><br /><br />
+    <!-- content -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row gx-5">
+                <aside class="col-lg-6">
+                    <div id="big-image-container" class="border rounded-4 mb-3 d-flex justify-content-center">
+                        <img style="max-width: 100%; max-height: 100%; margin: auto" class="rounded-4 fit" src="{{ product.product_images.first.image.url }}" />
+                    </div>
+                    <div class="d-flex justify-content-center mb-3">
+                        {% for image in product.product_images.all %}
+                        <a class="border mx-1 rounded-2"
+                            target="_blank"
+                            data-type="image"
+                            href="{{ image.image.url }}"
+                            class="item-thumb"
+                            onclick="showBigImage('{{ image.image.url }}', event)">
+                            <img width="60" height="60" class="rounded-2 small-image" src="{{ image.image.url }}" />
+                        </a>
+                        {% endfor %}
+                    </div>
+                </aside>
+                <main class="col-lg-6">
+                    <div class="ps-lg-3">
+                        <h4 class="title text-dark">
+                            <br />
+                            {{ product.product_name }}
+                        </h4>
+                        <div class="d-flex flex-row my-3">
+                            <div class="text-warning mb-1 me-2">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <span class="ms-1"> 4.5 </span>
+                            </div>
+                            <span class="text-muted">
+                                <i class="fas fa-shopping-basket fa-sm mx-1"></i>154 orders
+                            </span>
+                            <span class="text-success ms-2">In stock</span>
+                        </div>
+                        <div class="mb-3">
+                            {% if updated_price %}
+                            <span class="h5">₹ {{ updated_price }}.00</span>
+                            {% else %}
+                            <span class="h5">₹ {{ product.price }}.00</span>
+                            {% endif %}
+                            <span class="text-muted"></span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Description:</strong>
+                            <p>{{ product.product_description }}</p>
+                        </div>
+
+                        <div class="row">
+                          <div class="col-3">
+                              <strong>Brand:</strong>
+                          </div>
+                          <div class="col-9"><strong>{{ product.brand }}</strong></div>
+                      </div>
+
+                      <div class="row">
+                            <div class="col-3">
+                                <strong>Material:</strong>
+                            </div>
+                            <div class="col-9"><strong>{{ product.material }}</strong></div>
+                        </div>
+                        
+
+                        <div class="row">
+                          
+                          <div class="col-3">
+                            <strong>Color:</strong>
+                        </div>
+                         
+                        <div class="col-9">
+                          <div class="row">
+                              {% for color in product.color_variant.all %}
+                                  <div class="col-3">
+                                      <div class="form-check">
+                                          <input class="form-check-input"
+                                              type="radio"
+                                              name="color"
+                                              onchange="get_correct_price('{{ selected_size }}', '{{ color.color_name }}')"
+                                              id="{{ color.color_name }}"
+                                              value="{{ color.color_name }}"
+                                              {% if selected_color == color.color_name %} checked {% endif %} />
+                                          <label class="form-check-label" for="{{ color.color_name }}">
+                                              {{ color.color_name }}
+                                          </label>
+                                      </div>
+                                  </div>
+                              {% endfor %}
+                          </div>
+                      </div>
+
+                    </div>
+                      
+
+                        <div class="row">
+                          <div class="col-3">
+                              <strong>Size:</strong>
+                        </div>
+                        <div class="col-9">
+                          <div class="row">
+                              {% if available_sizes %}
+                                  {% for size in available_sizes %}
+                                      <div class="col-3">
+                                          <div class="form-check">
+                                              <input class="form-check-input"
+                                                  type="radio"
+                                                  name="size"
+                                                  onchange="get_correct_price('{{ size }}', '{{ selected_color }}')"
+                                                  id="{{ size }}"
+                                                  value="{{ size }}"
+                                                  {% if selected_size == size %} checked {% endif %} />
+                                              <label class="form-check-label" for="{{ size }}">
+                                                  {{ size }}
+                                              </label>
+                                          </div>
+                                      </div>
+                                  {% endfor %}
+                              {% endif %}
+                          </div>
+                      </div>
+
+
+                      <a href="{% url 'buy_now' product.uid %}?size={{ selected_size }}&color={{ selected_color }}" class="btn btn-warning shadow-0 mr-2"> Buy now </a>
+                      <a href="{% url 'add_to_cart' product.uid %}?size={{ selected_size }}&color={{ selected_color }}" class="btn btn-primary shadow-0 mr-2">
+                          <i class="me-1 fa fa-shopping-basket"></i> Add to cart
+                      </a>
+                      <a href="{% url 'wish_list' product.uid %}" class="btn btn-light border border-secondary py-2 icon-hover px-3">
+                          <i class="me-1 fa fa-heart fa-lg"></i> Save
+                      </a>
+
+                </main>
+            </div>
+        </div>
+    </section>
+    <!-- content -->
+    <script>
+        function get_correct_price(size, color) {
+            window.location.href = window.location.pathname + `?size=${size}&color=${color}`;
+        }
+
+        // JavaScript function to show big image when clicking on small image
+        function showBigImage(imageUrl, event) {
+            event.preventDefault(); // Prevent default behavior of anchor tag
+            var bigImage = document.querySelector("#big-image-container img");
+            bigImage.src = imageUrl;
+        }
+    </script>
+</body>
+</html>
+{% endblock %}

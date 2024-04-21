@@ -1,0 +1,296 @@
+{% extends "base.html" %} {% load static %} {% block body %}
+
+<!-- Breadcrumbs -->
+
+<div class="breadcrumbs">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <div class="bread-inner">
+          <ul class="bread-list">
+            <li>
+              <a href="index1.html">Home<i class="ti-arrow-right"></i></a>
+            </li>
+            <li class="active"><a href="blog-single.html">Cart</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Breadcrumbs -->
+
+<!-- Shopping Cart -->
+<div class="shopping-cart section">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <!-- Shopping Summery -->
+        <table class="table shopping-summery">
+          <thead>
+            <tr class="main-hading">
+              <th>PRODUCT</th>
+              <th>NAME</th>
+              <th class="text-center">UNIT PRICE</th>
+              <th class="text-center">QUANTITY</th>
+              <th class="text-center">TOTAL</th>
+              <th class="text-center"><i class="ti-trash remove-icon"></i></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cart_item in cart_items %}
+            <tr>
+              <td class="image" data-title="No">
+                <img
+                  src="{{ cart_item.product.product_images.last.image.url }}"
+                  alt="#"
+                />
+              </td>
+              <td class="product-des" data-title="Description">
+                <p class="product-name">
+                  <a href="#">{{ cart_item.product.product_name }}</a>
+                </p>
+                {% if item.size_variant %}
+                <p>Size: {{ item.size_variant.size_name }}</p>
+                {% endif %} {% if item.color_variant %}
+                <p>Color: {{ item.color_variant.color_name }}</p>
+                {% endif %}
+              </td>
+              <td class="price" data-title="Price">
+                <span>₹ {{ cart_item.get_product_price }}</span>
+              </td>
+
+              <td class="qty" data-title="Qty">
+                <!-- Input Order -->
+                <div class="input-group">
+                  <div class="button minus">
+                    <button
+                      type="button"
+                      class="btn btn-primary btn-number"
+                      onclick="decreaseQuantity('{{ cart_item.uid }}')"
+                    >
+                      <i class="ti-minus"></i>
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    id="quantity_input_{{ cart_item.uid }}"
+                    class="input-number"
+                    readonly
+                    data-min="1"
+                    data-max="100"
+                    value="{{ cart_item.quantity }}"
+                  />
+                  <div class="button plus">
+                    <button
+                      type="button"
+                      class="btn btn-primary btn-number"
+                      onclick="increaseQuantity('{{ cart_item.uid }}')"
+                    >
+                      <i class="ti-plus"></i>
+                    </button>
+                  </div>
+                </div>
+                <!--/ End Input Order -->
+              </td>
+              <td
+                class="total-amount"
+                id="total_amount_{{ cart_item.uid }}"
+                data-title="Total"
+              >
+                <span>₹ {{ cart_item.get_product_price_with_quantity }}</span>
+              </td>
+
+              <td class="action" data-title="Remove">
+                <a href="{% url 'remove_cart' cart_item.uid %}"
+                  ><i class="ti-trash remove-icon"></i
+                ></a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <!--/ End Shopping Summery -->
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <!-- Total Amount -->
+        <div class="total-amount">
+          <div class="row">
+            <div class="col-lg-8 col-md-5 col-12">
+              <div class="left">
+                {% for message in messages %}
+                <div
+                  class="alert alert-{{message.tags}} alert-dismissible fade show"
+                  role="alert" id='messages-container'
+                >
+                  <strong></strong>{{ message }}
+                  <button
+                    type="button"
+                    class="close"
+                    data-dismiss="alert"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                {% endfor %}
+
+                <div class="coupon">
+                  <form action="#" method="POST" target="_blank">
+                    {% csrf_token %}
+                    <input name="coupon" placeholder="Enter Your Coupon" />
+
+                    <button type="submit" class="btn">Apply</button>
+                    {% if cart.coupon %}
+                    <a
+                      href="{% url 'remove_coupon' cart.uid %}"
+                      class="btn btn-danger"
+                      >Remove Coupon</a
+                    >
+
+                    {% endif %}
+                  </form>
+                </div>
+
+                <br />
+
+                
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-7 col-12">
+              <div class="right">
+                <ul>
+                  <li>
+                    Cart Subtotal<span class="subtotal" id="subtotal"
+                    >₹{{ subtotal }}
+                  </li>
+                  <li>Shipping<span>Free</span></li>
+                  {% if cart.coupon %}
+                  <li>COUPON Applied<span>- ₹{{ cart.coupon.discount_price }}</span></li>
+                  {% endif %}
+                  <li class="last">
+                    You Pay<span class="total_amount" id="total_amount_"
+                      >₹{{ total_price }}</span
+                    >
+                  </li>
+                </ul>
+
+                <div class="button5">
+                  
+                  <a href="{% url 'checkout' %}" class="btn">Checkout</a>
+                  <a href="#" class="btn">Continue shopping</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--/ End Total Amount -->
+      </div>
+    </div>
+  </div>
+</div>
+<!--/ End Shopping Cart -->
+
+<!-- Start Shop Services Area  -->
+<section class="shop-services section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-3 col-md-6 col-12">
+        <!-- Start Single Service -->
+        <div class="single-service">
+          <i class="ti-rocket"></i>
+          <h4>Free shiping</h4>
+          <p>Orders over $100</p>
+        </div>
+        <!-- End Single Service -->
+      </div>
+      <div class="col-lg-3 col-md-6 col-12">
+        <!-- Start Single Service -->
+        <div class="single-service">
+          <i class="ti-reload"></i>
+          <h4>Free Return</h4>
+          <p>Within 30 days returns</p>
+        </div>
+        <!-- End Single Service -->
+      </div>
+      <div class="col-lg-3 col-md-6 col-12">
+        <!-- Start Single Service -->
+        <div class="single-service">
+          <i class="ti-lock"></i>
+          <h4>Sucure Payment</h4>
+          <p>100% secure payment</p>
+        </div>
+        <!-- End Single Service -->
+      </div>
+      <div class="col-lg-3 col-md-6 col-12">
+        <!-- Start Single Service -->
+        <div class="single-service">
+          <i class="ti-tag"></i>
+          <h4>Best Peice</h4>
+          <p>Guaranteed price</p>
+        </div>
+        <!-- End Single Service -->
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End Shop Newsletter -->
+<br /><br />
+
+<script>
+  function decreaseQuantity(itemId) {
+    fetch(`/decrease_quantity/${itemId}/`)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Failed to decrease quantity");
+        }
+      })
+      .then((data) => {
+        const quantityInput = document.getElementById(
+          `quantity_input_${itemId}`
+        );
+        const totalAmount = document.getElementById(`total_amount_${itemId}`);
+        const subtotal = document.getElementById(`subtotal`);
+        const newQuantity = parseInt(quantityInput.value) - 1;
+        if (newQuantity >= 1) {
+          quantityInput.value = newQuantity;
+          totalAmount.innerHTML = `<span>$${data.total_price}</span>`;
+          subtotal.innerHTML = `<span>$${data.subtotal}</span>`; // Update subtotal here
+          window.location.reload(); // Refresh the page
+        }
+      })
+      .catch((error) => console.error("Error:", error));
+  }
+
+  function increaseQuantity(itemId) {
+    fetch(`/increase_quantity/${itemId}/`)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Failed to increase quantity");
+        }
+      })
+      .then((data) => {
+        const quantityInput = document.getElementById(
+          `quantity_input_${itemId}`
+        );
+        const totalAmount = document.getElementById(`total_amount_${itemId}`);
+        const subtotal = document.getElementById(`subtotal`);
+        quantityInput.value = parseInt(quantityInput.value) + 1;
+        totalAmount.innerHTML = `<span>$${data.total_price}</span>`;
+        subtotal.innerHTML = `<span>$${data.subtotal}</span>`; // Update subtotal here
+        window.location.reload(); // Refresh the page
+      })
+      .catch((error) => console.error("Error:", error));
+  }
+</script>
+
+
+
+
+{% endblock body %}
