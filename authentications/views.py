@@ -177,6 +177,7 @@ def change_password(request, token):
     return render(request, 'auth/change_password.html',context)
 
 
+'''
 def forgetPassword(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -195,8 +196,24 @@ def forgetPassword(request):
         else:
             messages.error(request, 'No user found with this email.')
 
-        return redirect('/auth/forget_password/')  # Check this URL
-
+        return redirect('/auth/forget_password/')  
     return render(request, 'auth/forget_password.html')
-
-
+'''
+def forgetPassword(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        user = CustomUser.objects.filter(email=email).first()
+        if user:
+            try:
+                profile = Profile.objects.get(user=user)
+            except Profile.DoesNotExist:
+                profile = Profile.objects.create(user=user)
+            token = str(uuid.uuid4())
+            profile.forget_password_token = token
+            profile.save()
+            send_forget_password_mail(user.email, token)
+            messages.success(request, 'An email has been sent.')
+        else:
+            messages.error(request, 'No user found with this email.')
+        return redirect('/auth/forget_password/')  
+    return render(request, 'auth/forget_password.html')

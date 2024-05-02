@@ -59,7 +59,6 @@ class Product(BaseModel):
     def get_product_price_by_size(self, size):
         size_variants = self.size_variant.filter(size_name=size)
         if size_variants.exists():
-            # Assuming you want to return the price of the first matching size variant
             size_variant = size_variants.first()
             return size_variant.price 
         else:
@@ -136,51 +135,6 @@ class Cart(BaseModel):
         return price
 
 
-'''class CartItems(BaseModel):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='cart_items')
-    user = models.ForeignKey(CustomUser,  on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True)
-    color_variant = models.ForeignKey(ColorVariant, on_delete=models.SET_NULL, null=True, blank=True)
-    size_variant = models.ForeignKey(SizeVariant, on_delete=models.SET_NULL, null=True, blank=True)
-    quantity = models.PositiveIntegerField(default=1)
-    
-
-    def get_product_price(self):
-        price = [self.product.price]
-
-        if self.color_variant:
-            color_variant_price = self.color_variant.price
-            price.append(color_variant_price)
-
-        if self.size_variant:
-            size_variant_price = self.size_variant.price
-            price.append(size_variant_price)
-        return sum(price)
-
-    def increase_quantity(self):
-        self.quantity += 1
-        self.save()
-
-    def decrease_quantity(self):
-        if self.quantity > 1:
-            self.quantity -= 1
-            self.save()
-
-    def get_total_price(self):
-        price = self.product.price
-        if self.color_variant:
-            price += self.color_variant.price
-        if self.size_variant:
-            price += self.size_variant.price
-        return price * self.quantity
-
-    def get_product_price_with_quantity(self):
-        return self.get_product_price() * self.quantity
-
-    def get_product_price_with_quantity_with_Shipping(self):
-        return self.get_product_price_with_quantity() * 20
-
-'''
 
 class CartItems(BaseModel):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='cart_items')

@@ -250,3 +250,4 @@ def download_pdf(request, file_name):
         print("Error downloading PDF:", e)
         # Return a 500 Internal Server Error response
         return HttpResponseServerError("An error occurred while downloading the PDF file.")
+
